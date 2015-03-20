@@ -17,4 +17,4 @@ It opens an editor,
 type your message
 then ESC+":wq"
 
-Press tab to autocomplete
+Press Tab to autocomplete
