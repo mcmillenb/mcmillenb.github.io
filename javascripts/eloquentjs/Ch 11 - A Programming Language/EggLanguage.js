@@ -171,6 +171,8 @@ topEnv["false"] = false;
 // way to output values
 topEnv["print"] = function(value){
     console.log(value);
+    //using this for testing
+    document.getElementById("test").appendChild(document.createTextNode(value+" "));
     return value;
 }
 
