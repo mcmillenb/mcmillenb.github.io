@@ -1,0 +1,47 @@
+/**
+* Created with mcmillenb.
+* User: mcmillenb
+* Date: 2015-04-19
+* Time: 10:38 PM
+*/
+<style>
+  .trail { /* className for the trail elements */
+    position: absolute;
+    height: 6px; width: 6px;
+    border-radius: 3px;
+    background: teal;
+  }
+  body {
+    height: 300px;
+  }
+</style>
+
+<script>
+  var dot;
+  var dots = [];
+  var counter = 1;
+  var NUMDOTS = 100; // how many dots will make up the trail
+  
+  // initially create the dot elements
+  for (var i = 0; i < NUMDOTS; i++){
+    dot = document.createElement("div");
+    dot.className = "trail";
+    document.body.appendChild(dot);
+    dots[i] = dot;
+    console.log(dots);
+  }
+  
+  // increment a counter to move an indexed dot every time the
+  // mousemove event fires
+  addEventListener("mousemove", function(event) {
+    // event.pageX and event.pageY reference the mouse pointer position
+    moveToPos(counter++ % NUMDOTS, event.pageX, event.pageY);
+  });
+  
+  // move a given indexed dot to a given coordinate
+  function moveToPos(index, x, y){
+    dot = dots[index];
+    dot.style.left = x - 3 + "px";
+    dot.style.top = y - 3 + "px";
+  }
+</script>
