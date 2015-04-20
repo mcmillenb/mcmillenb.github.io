@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<div id="wrapper">
+  <div data-tabname="one">Tab one</div>
+  <div data-tabname="two">Tab two</div>
+  <div data-tabname="three">Tab three</div>
+</div>
+<script>
+  NodeList.prototype.forEach = Array.prototype.forEach;
+  
+  function asTabs(node) {
+    // get the tabs
+    var tabs = node.querySelectorAll('[data-tabname]');
+    var buttons = [];
+    var first = true;
+    
+    // for every tab element
+    tabs.forEach(function(tab){
+      // create a button from the text in the tab
+      var button = document.createElement("input");
+      button.type = "button";
+      button.value = tab.innerText;
+      buttons.push(button);
+        
+      // add a click listener to only display the tab for this button
+      button.addEventListener("click", function(event){
+        tabs.forEach(function(tab){
+          tab.style.display = "none";
+        });
+        buttons.forEach(function(butt){
+          butt.style.color = "black";
+        });
+        button.style.color = "red";
+        tab.style.display = "block";
+      });
+      
+      // add the tab button before the first tab
+      node.insertBefore(button, node.querySelector('[data-tabname]'));
+        
+      // if this is the first button, click it
+      if (first) button.click(); first = false;
+    });
+  }
+  asTabs(document.querySelector("#wrapper"));
+</script>
+</body>
+</html>
