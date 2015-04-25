@@ -9,44 +9,58 @@
 var SCALE = 20;
 var MAXSTEP = 0.05;
 
-var arrowCodes = {37: "left", 38: "up", 39: "right"};
-
+// returns an object that tracks the current position of given keys.
+//   codes - key codes as property names and key names as values
 function trackKeys(codes) {
-    var pressed = Object.create(null);
+    var pressed = Object.create(null); 
     function handler(event) {
+        // if one of the keys in arrowCodes
         if (codes.hasOwnProperty(event.keyCode)) {
+            // bool for whether key is down or not
             var down = event.type == "keydown";
+            // set property corresponding to key
             pressed[codes[event.keyCode]] = down;
             event.preventDefault();
         }
     }
+    // listen for a key down or up
     addEventListener("keydown", handler);
     addEventListener("keyup", handler);
     return pressed;
 }
 
+// calls a given "frameFunc" function to draw a new frame
+// until the function returns false
 function runAnimation(frameFunc) {
     var lastTime = null;
     function frame(time) {
         var stop = false;
         if (lastTime != null) {
+            // set a max step of 100 milliseconds
             var timeStep = Math.min(time - lastTime, 100) / 1000;
             stop = frameFunc(timeStep) === false;
         }
         lastTime = time;
         if (!stop)
-            requestAnimationFrame(frame);
+            requestAnimationFrame(frame); // keeps going unless the frameFunc returns false
     }
-    requestAnimationFrame(frame);
+    requestAnimationFrame(frame); // initial call
 }
 
+// codes for the arrow keys that need listeners
+var arrowCodes = {37: "left", 38: "up", 39: "right"};
 var arrows = trackKeys(arrowCodes);
 
+// takes a level object, a constructor for a display,
+// and, optionally, a function. Displays the level and 
+// lets the user play through it. 
 function runLevel(level, Display, andThen) {
     var display = new Display(document.body, level);
     runAnimation(function(step) {
         level.animate(step, arrows);
         display.drawFrame(step);
+        // Clears the display, stops the animation, and, if an andThen function was
+        // given, calls that function with the level's status
         if (level.isFinished()) {
             display.clear();
             if (andThen)
@@ -56,16 +70,17 @@ function runLevel(level, Display, andThen) {
     });
 }
 
+// goes through the sequence of levels. 
 function runGame(plans, Display) {
     function startLevel(n) {
         runLevel(new Level(plans[n]), Display, function(status) {
             if (status == "lost")
-                startLevel(n);
+                startLevel(n); // restart level
             else if (n < plans.length -1)
-                startLevel(n + 1);
+                startLevel(n + 1); // start next level if there is one
             else
                 console.log("You win!");
-        })
+        });
     }
     startLevel(0);
 }
@@ -144,8 +159,8 @@ Level.prototype.actorAt = function(actor) {
 };
 
 // moves the actors
-// step - time in seconds
-// keys - contains info about the arrow keys the player has pressed
+//   step - time in seconds
+//   keys - contains info about the arrow keys the player has pressed
 Level.prototype.animate = function(step, keys) {
     if (this.status != null) // if the player has won or lost
         this.finishDelay -= step;
@@ -159,6 +174,8 @@ Level.prototype.animate = function(step, keys) {
     }
 };
 
+// handles the player colliding with elements in the
+// environment
 Level.prototype.playerTouched = function(type, actor) {
     if (type == "lava" && this.status == null) {
         this.status = "lost";
@@ -176,6 +193,7 @@ Level.prototype.playerTouched = function(type, actor) {
     }
 };
 
+// represents a location
 function Vector(x, y) {
     this.x = x; this.y = y;
 }
@@ -199,17 +217,23 @@ function Player(pos) {
 }
 Player.prototype.type = "player";
 
+// constants related to player motion
 var PLAYERXSPEED = 7;
 var GRAVITY = 30;
 var JUMPSPEED = 17;
 
+// The horizontal motion of the player 
 Player.prototype.moveX = function(step, level, keys) {
     this.speed.x = 0; 
+    // Checks the state of the left / right keys
     if (keys.left) this.speed.x -= PLAYERXSPEED;
     if (keys.right) this.speed.x += PLAYERXSPEED;
     
+    // sets the new position
     var motion = new Vector(this.speed.x * step, 0);
     var newPos = this.pos.plus(motion);
+    
+    // if the player hits something, run the playerTouched method
     var obstacle = level.obstacleAt(newPos, this.size);
     if (obstacle)
         level.playerTouched(obstacle);
@@ -217,26 +241,35 @@ Player.prototype.moveX = function(step, level, keys) {
         this.pos = newPos;
 };
 
+// The vertical motion of the player
 Player.prototype.moveY = function(step, level, keys) {
-    this.speed.y += step * GRAVITY;
+    // start with acceleration from gravity
+    this.speed.y += step * GRAVITY; 
+    
+    // sets the new position
     var motion = new Vector(0, this.speed.y * step);
     var newPos = this.pos.plus(motion);
+    
+    // if the player hits something... 
     var obstacle = level.obstacleAt(newPos, this.size);
     if (obstacle){
         level.playerTouched(obstacle);
-        if (keys.up && this.speed.y > 0)
+        if (keys.up && this.speed.y > 0) // if jumping
             this.speed.y -= JUMPSPEED;
         else 
-            this.speed.y = 0;
+            this.speed.y = 0; // else stop going down
     } else {
         this.pos = newPos;
     }
 };
 
+// moves the player and checks for interaction with other actors
 Player.prototype.act = function(step, level, keys) {
+    // run both move methods
     this.moveX(step, level, keys);
     this.moveY(step, level, keys);
     
+    // interact with other actors
     var otherActor = level.actorAt(this);
     if (otherActor)
         level.playerTouched(otherActor.type, otherActor);
@@ -262,6 +295,9 @@ function Lava(pos, ch) {
 }
 Lava.prototype.type = "lava";
 
+// computes a new position for a lava object by adding
+// the procuct of the time step and its current speed
+// to its old position
 Lava.prototype.act = function(step, level) {
     var newPos = this.pos.plus(this.speed.times(step));
     if (!level.obstacleAt(newPos, this.size)) // standard lava
@@ -281,6 +317,9 @@ Coin.prototype.type = "coin";
 
 var WOBBLESPEED = 8, WOBBLEDIST = 0.07;
 
+// wobbles the coin object. 
+// ignores collisions since that is handled in the 
+// player's act method
 Coin.prototype.act = function(step) {
     this.wobble += step * WOBBLESPEED;
     var wobblePos = Math.sin(this.wobble) * WOBBLEDIST;
@@ -304,6 +343,9 @@ function DOMDisplay(parent, level) {
     this.drawFrame();
 }
 
+// draws the background as a table element, appending
+// row elements for each row in the level, and appending
+// cell elements for each type of block
 DOMDisplay.prototype.drawBackground = function() {
     var table = elt("table", "background");
     table.style.width = this.level.width * SCALE + "px";
@@ -332,14 +374,22 @@ DOMDisplay.prototype.drawActors = function() {
     return wrap;
 };
 
+// first removes the old actor graphics, if any, and then redraws
+// them in their new positions. 
 DOMDisplay.prototype.drawFrame = function() {
     if (this.actorLayer)
         this.wrap.removeChild(this.actorLayer);
     this.actorLayer = this.wrap.appendChild(this.drawActors());
+    // by adding the level's current status as a class name to the wrapper,
+    // we can style the player actor slightly differently when the game is won
+    // or lost by adding a CSS rule that takes effect only when the player has 
+    // an ancestor element with a given class.
     this.wrap.className = "game " + (this.level.status || "");
     this.scrollPlayerIntoView(); // cant assume the level fits in the viewport
 };
 
+// Ensures that if the level is protruding outside the viewport,
+// we scroll that viewport to make sure the player is near its center.
 DOMDisplay.prototype.scrollPlayerIntoView = function() {
     var width = this.wrap.clientWidth;
     var height = this.wrap.clientHeight;
@@ -353,6 +403,8 @@ DOMDisplay.prototype.scrollPlayerIntoView = function() {
     var center = player.pos.plus(player.size.times(0.5))
                     .times(SCALE);
 
+    // Verify that the player position insn't outside of the 
+    // allowed range.
     if (center.x < left + margin)
         this.wrap.scrollLeft = center.x - margin;
     else if (center.x > right - margin)
@@ -363,6 +415,7 @@ DOMDisplay.prototype.scrollPlayerIntoView = function() {
         this.wrap.scrollTop = center.y + margin - height;
 };
 
+// clears a displayed level
 DOMDisplay.prototype.clear = function() {
     this.wrap.parentNode.removeChild(this.wrap);
 };
@@ -524,8 +577,6 @@ var levelPlans = [
 ]];
 
 var plans = [];
-levelPlans.forEach(function(level){
-    plans.push(level);
-});
+levelPlans.forEach(function(level){ plans.push(level); });
 
 runGame(plans, DOMDisplay);
