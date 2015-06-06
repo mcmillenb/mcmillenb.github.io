@@ -7,6 +7,7 @@ To change this template use Tools | Templates.
     <title></title>
 </head>
 <body>
+    <div>Run javascript code. It spits out the result!</div>
     <textarea id="code">return "hi";</textarea>
     <button id="button" onclick="run()">Run</button>
     <pre id="output"></pre>
@@ -25,6 +26,44 @@ To change this template use Tools | Templates.
           output.textContent = "ERROR: " + err.message; 
         }
       }
-</script>
+    </script>
+    
+    <div>Type stuff in here and it'll autocomplete with global variable names:</div>
+    <input type="text" id="field">
+    <div id="suggestions" style="cursor: pointer"></div>
+
+    <script>
+      // Builds up an array with global variable names, like
+      // 'alert', 'document', and 'scrollTo'
+      var terms = [];
+      for (var name in window)
+        terms.push(name);
+  
+      var field = document.querySelector("#field");
+      var suggest = document.querySelector("#suggestions");
+      var lastDiv;
+    
+      field.addEventListener("input", function(event) {
+        var div = document.createElement("DIV"); 
+        addSuggestions(div, field.value);
+        if (lastDiv) suggest.removeChild(lastDiv);
+        suggest.appendChild(div);
+        lastDiv=div;
+      });
+  
+      function addSuggestions(div, val){
+        // div - div to add results to
+        // val - the value to check
+  
+        if (val.length == 0) return; // return if no input
+        for (var i in terms){
+          if (terms[i].indexOf(val) == 0) { // if the term begins with the input value
+            var child = document.createElement("DIV");
+            child.textContent = terms[i];
+            div.appendChild(child); // add the term as its own div to the parent div
+          }
+        }
+      }
+    </script>
 </body>
 </html>
