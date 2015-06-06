@@ -33,3 +33,6 @@
 .won .player {
     box-shadow: -4px -7px 8px white, 4px -7px 8px white;
 }
+
+/* hud */
+#hud { font-family: Impact,Charcoal,sans-serif; }

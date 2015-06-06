@@ -1,0 +1,30 @@
+<!--
+To change this template use Tools | Templates.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <textarea id="code">return "hi";</textarea>
+    <button id="button" onclick="run()">Run</button>
+    <pre id="output"></pre>
+
+    <script>
+      var textarea = document.querySelector("textarea");
+      var output = document.querySelector("#output");
+  
+      function run(){
+        // try to make a function from what the user input and run it
+        try { 
+          textFunc = new Function(textarea.value); 
+          output.textContent = textFunc(); 
+        }
+        catch(err) { 
+          output.textContent = "ERROR: " + err.message; 
+        }
+      }
+</script>
+</body>
+</html>

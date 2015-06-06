@@ -48,16 +48,19 @@ function runAnimation(frameFunc) {
 }
 
 // codes for the arrow keys that need listeners
-var arrowCodes = {37: "left", 38: "up", 39: "right"};
-var arrows = trackKeys(arrowCodes);
+var keyCodes = {27: "esc", 37: "left", 38: "up", 39: "right"};
+var keys = trackKeys(keyCodes);
 
 // takes a level object, a constructor for a display,
 // and, optionally, a function. Displays the level and 
 // lets the user play through it. 
 function runLevel(level, Display, andThen) {
     var display = new Display(document.body, level);
+    
     runAnimation(function(step) {
-        level.animate(step, arrows);
+        if (keys.esc)
+            return false;
+        level.animate(step, keys);
         display.drawFrame(step);
         // Clears the display, stops the animation, and, if an andThen function was
         // given, calls that function with the level's status
@@ -72,17 +75,22 @@ function runLevel(level, Display, andThen) {
 
 // goes through the sequence of levels. 
 function runGame(plans, Display) {
-    function startLevel(n) {
+    function startLevel(n, lives) {
+        var hud = document.getElementById("hud");
+        hud.innerText = "Lives: " + lives;
         runLevel(new Level(plans[n]), Display, function(status) {
             if (status == "lost")
-                startLevel(n); // restart level
+                if (lives == 1)
+                    startLevel(0, 3); // restart game if the user dies three times
+                else
+                    startLevel(n, lives-1); // restart level
             else if (n < plans.length -1)
-                startLevel(n + 1); // start next level if there is one
+                startLevel(n + 1, lives); // start next level if there is one
             else
                 console.log("You win!");
         });
     }
-    startLevel(0);
+    startLevel(0, 3);
 }
 
 // creates a level given a level plan
