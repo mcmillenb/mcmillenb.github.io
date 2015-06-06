@@ -165,6 +165,68 @@ tools.Spray = function(event, cx){
     });
 };
 
+// Tool for drawing a rectangle
+tools.Rectangle = function(event, cx) {
+    // Create a rectangle add it to the body
+    var rect = elt("div");
+    rect.style["position"] = "absolute";
+    rect.style["background-color"] = cx.fillStyle;
+    document.body.appendChild(rect);
+    
+    var pos = relativePos(event, cx.canvas);
+    var startX = event.pageX;
+    var startY = event.pageY;
+    var left,width,top,height;
+    trackDrag(function(event){
+      var curPos = relativePos(event, cx.canvas);
+
+      // calculate the position and size of the div to display
+      var toRight = (pos.x < curPos.x)
+      left = (toRight) ? startX : curPos.x + startX - pos.x;
+      width = (toRight) ? curPos.x - pos.x : pos.x - curPos.x;
+      var below = (pos.y < curPos.y)
+      top = (below) ? startY : curPos.y + startY - pos.y;
+      height = (below) ? curPos.y - pos.y : pos.y - curPos.y;
+      
+      // account for drawing out of bounds
+      var bounds = cx.canvas.getBoundingClientRect();
+      if (bounds.left > left){
+        width -= bounds.left - left;
+        left = bounds.left;
+      }
+      if (bounds.right < left + width){
+        width = bounds.right - left;
+      }
+      if (bounds.top > top){
+        height -= bounds.top - top;
+        top = bounds.top;
+      }
+      if (bounds.bottom < top + height){
+        height = bounds.bottom - top;
+      }
+      
+      // set the div's properties
+      rect.style.left = left + "px";
+      rect.style.width = width + "px";
+      rect.style.top = top + "px";
+      rect.style.height = height + "px";
+
+    }, function() {
+      // on mouseup, actually draw the rectangle to the canvas and remove the div
+      cx.fillRect(left - (startX - pos.x) + 1, top - (startY - pos.y) + 1,
+                  width, height);
+      document.body.removeChild(rect);
+    });
+};
+
+// Tool for picking a color
+tools["Pick color"] = function(event, cx) {
+    var pos = relativePos(event, cx);
+    var data = cx.getImageData(pos.x,pos.y,1,1).data;
+    var color = rgb(data[0],data[1],data[2]);
+    cx.fillStyle = cx.strokeStyle = color;
+};
+
 // helper function to find a random position under the brush
 function randomPointInRadius(radius){
     for(;;) {
