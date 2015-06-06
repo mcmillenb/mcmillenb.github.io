@@ -213,7 +213,7 @@ function trackDrag(onMove, onEnd){
 
 // helper function to easily create elements
 function elt(name, attributes) {
-    var node = document.creatElement(name);
+    var node = document.createElement(name);
     // assign any specified attributes
     if (attributes) {
         for (var attr in attributes)
