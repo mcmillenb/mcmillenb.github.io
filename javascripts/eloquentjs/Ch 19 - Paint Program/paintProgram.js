@@ -44,8 +44,7 @@ controls.tool = function(cx) {
 controls.color = function(cx){
     var input = elt("input", {type: "color"});
     input.addEventListener("change", function(){
-        cx.fillStyle = input.value;
-        cx.strokeStyle = input.value;
+        cx.fillStyle = cx.strokeStyle = input.value;
     });
     return elt("span", null, "Color: ", input);
 };
@@ -220,11 +219,93 @@ tools.Rectangle = function(event, cx) {
 };
 
 // Tool for picking a color
-tools["Pick color"] = function(event, cx) {
-    var pos = relativePos(event, cx);
-    var data = cx.getImageData(pos.x,pos.y,1,1).data;
-    var color = rgb(data[0],data[1],data[2]);
-    cx.fillStyle = cx.strokeStyle = color;
+tools["Pick Color"] = function(event, cx) {
+    try { // try to get image data from pixel at mouse pos
+      var pos = relativePos(event, cx.canvas);
+      var data = cx.getImageData(pos.x,pos.y,1,1).data;
+      var color = "rgb("+data[0]+","+data[1]+","+data[2]+")";
+      cx.fillStyle = cx.strokeStyle = color;
+    } 
+    catch (e){
+      if (e instanceof SecurityError)
+        alert("Can't save: " + e.toString());
+      else
+        throw e;
+    }
+};
+
+// Tool for filling a space with a color (room for performance improvement)
+tools["Flood fill"] = function(event, cx) {
+    var pos = relativePos(event, cx.canvas);
+    var width = cx.canvas.width;
+    var height = cx.canvas.height;
+    
+    try { // try to get image data from pixel at mouse pos
+      var data = cx.getImageData(0,0,width,height).data;
+    }
+    catch (e){
+      if (e instanceof SecurityError)
+        alert("Error: " + e.toString());
+      else
+        throw e;
+    }
+    // get the color to compare 
+    var baseColor = getColor(data, width, pos.x, pos.y);
+    
+    // initialize the mulitdimensional array to store the pixels which have been drawn
+    var drawn = [];
+    for (var i = 0; i < width; i++)
+      drawn[i] = [];
+    
+    // add the current position to the array of pixels to draw
+    var toDraw = [pos];
+    while (toDraw.length){ // while there are pixels to draw, run the function
+      drawDot(cx, toDraw[toDraw.length-1], data, drawn, toDraw, baseColor);
+    }
+    
+    delete toDraw, drawn, data, pos; //just in case
+};
+
+// draws one pixel and checks the four neighbors and adds to the list
+// of pixels to draw if they are of the same color
+function drawDot(cx, pos, data, drawn, toDraw, color){
+    var x = pos.x;
+    var y = pos.y;
+    var width = cx.canvas.width;
+    var height = cx.canvas.height;
+    
+    // draw the pixel, flag as having been drawn, and remove from the list
+    cx.fillRect(x, y, 1, 1);
+    drawn[x][y] = true;
+    toDraw.pop();
+  
+    // check the neighbor pixels and add them to the list if the same color
+  	//up
+    if(!drawn[x][y-1] && (y !== 0)){
+      if (color === getColor(data,width,x,y-1))
+        toDraw.push({x: x, y: y-1});
+    }
+    //right
+    if(drawn[x+1] && !drawn[x+1][y] && (x < width -1)){
+      if (color === getColor(data,width,x+1,y)) 
+        toDraw.push({x: x+1, y: y});
+    }
+    //down
+    if(!drawn[x][y+1] && (y < height -1)){
+      if (color === getColor(data,width,x,y+1)) 
+        toDraw.push({x: x, y: y+1});
+    }
+    //left
+    if(drawn[x-1] && !drawn[x-1][y] && (x !== 0)){
+      if (color === getColor(data,width,x-1,y)) 
+        toDraw.push({x: x-1, y: y});
+    }
+};
+  
+// get the color from the image's data array 
+function getColor(data, width, x, y){
+    var off = (y * width + x)*4;
+    return color = "" + data[off] + data[off+1] + data[off+2];
 };
 
 // helper function to find a random position under the brush
