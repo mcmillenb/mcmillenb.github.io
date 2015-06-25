@@ -85,7 +85,7 @@ http.createServer(function(request, response) {
   else
     respond(405, "Method " + request.method +
             " not allowed.");
-}).listen(8000);
+}).listen(80, "mcmillenb.github.io");
 
 // parses a given url
 function urlToPath(url){
