@@ -26,7 +26,7 @@
             req.send(null);
         };
         
-        req.open("POST", "/", true);
+        req.open("POST", "../", true);
         req.addEventListener("load", function(){
             editor.value = req.responseText;
         });
