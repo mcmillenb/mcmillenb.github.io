@@ -1,6 +1,10 @@
+html, body {
+	height: 100%;
+}
+
 #page {
 	margin: 20px auto;
-	min-height: 300px;
+	min-height: 100%;
 }
 
 #reset {
