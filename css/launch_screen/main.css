@@ -1,0 +1,71 @@
+#page {
+  position: relative;
+  height: 400px;
+  max-width: 90%;
+  min-width: 240px;
+  border-radius: 25px;
+  margin: 0 auto;
+  overflow: scroll;
+  background-color: white;
+}
+
+.container {
+  position: relative;
+  margin-top: 16px;
+  height: 100px;
+  min-width: 100px;
+  width: 50%;
+  float: left;
+  display: block;
+}
+
+@media only screen and (min-width: 500px) and (max-width: 999px) {
+  .container {
+    width: 25%;
+  }
+}
+
+@media only screen and (min-width: 1000px) {
+  .container {
+    width: 16.66666666%;
+  }
+}
+
+.icon {
+  height: 80px;
+  width: 80px;
+  margin: 5px auto;
+  border-radius: 15px;
+}
+
+#icon1 {
+  background-image: url('../../images/launch_screen/icon-amazon.png');
+}
+
+#icon2 {
+  background-image: url('../../images/launch_screen/icon-dropbox.png');
+}
+
+#icon3 {
+  background-image: url('../../images/launch_screen/icon-evernote.png');
+}
+
+#icon4 {
+  background-image: url('../../images/launch_screen/icon-github.png');
+}
+
+#icon5 {
+  background-image: url('../../images/launch_screen/icon-googleplus.png');
+}
+
+#icon6 {
+  background-image: url('../../images/launch_screen/icon-pintrest.png');
+}
+
+#icon7 {
+  background-image: url('../../images/launch_screen/icon-soundcloud.png');
+}
+
+#icon8 {
+  background-image: url('../../images/launch_screen/icon-tumblr.png');
+}

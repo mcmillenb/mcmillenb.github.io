@@ -9,26 +9,41 @@
 class Sound 
 {
 	/**
-	 * Initialize the oscilator and gain node for the sound object. Set the type
-	 * of oscillator and the frequency (if provided).
+	 * Initialize the oscillator and gain node for the sound object. Set the 
+	 * type of oscillator and the frequency (if provided).
 	 * @param  {string} type The type of oscillator 
 	 * @param  {int}    freq The frequency of the pitch		
 	 * @return {void} 
 	 */
 	constructor(type, freq) {
-	    var oscillator = audioCtx.createOscillator();
-		var gainNode   = audioCtx.createGain();
+		this.gainNode = audioCtx.createGain();
+		this.gainNode.gain.value = 0.0;
 
-		gainNode.gain.value = 0.0;
+		this.osc  = this.initOscillator(type, freq);
+		this.type = this.osc.type;
 
-		oscillator.connect(gainNode);
+		this.setPeriodicWave();
+	}
+
+	initOscillator(type, freq) {
+		var oscillator = audioCtx.createOscillator();
+		oscillator.connect(this.gainNode);
 		oscillator.type = type || 'sine'; 
 		oscillator.frequency.value = freq || 500; 
 		oscillator.start();
 
-		this.osc      = oscillator;
-		this.gainNode = gainNode;
-		this.type     = oscillator.type;
+		return oscillator;
+	}
+
+	setPeriodicWave() {
+		var real = new Float32Array([0,1,0,1]);
+		var imag = new Float32Array([0,.5,.5,.5]);
+
+		var wave = audioCtx.createPeriodicWave(
+			real, imag, {disableNormalization: false}
+		);
+
+		this.osc.setPeriodicWave(wave);
 	}
 
 	/**
