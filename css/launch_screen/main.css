@@ -1,8 +1,7 @@
 #page {
   position: relative;
   height: 400px;
-  width: 90%;
-  max-width: 1200px;
+  max-width: 90%;
   min-width: 240px;
   border-radius: 25px;
   margin: 0 auto;
