@@ -17,9 +17,7 @@ $page.sortable({
     _pressing = false;
     $(this).sortable('disable');
   }
-});
-$page.sortable('disable'); // disable initially
-$page.disableSelection();
+}).sortable('disable'); // disable initially
 
 /**
  * Animate an icon element to wiggle rotationally
@@ -77,7 +75,9 @@ function startDragging() {
 
 /** EVENT LISTENERS **/
 
-$icons.mousedown(function(e) { // when the mouse goes down on an icon
+// when the mouse goes down on an icon
+$icons.on('mousedown touchstart', function(e) { 
+  e.preventDefault();
   if (_dragging) {
     return;
   }
@@ -89,16 +89,14 @@ $icons.mousedown(function(e) { // when the mouse goes down on an icon
     startDragging();
     $this.trigger(event);
   }, 500); 
-}).mousemove(function() { // when the mouse moves on an icon
+}).on('mousemove touchmove', function() { // when the mouse moves on an icon
   clearTimeout(_pressTimeout);
   _pressing = false; // then the state is set to not pressing
 });
 
-
-$('body').mouseup(function() { // when the mouse goes up anywhere in the body
+// when the mouse goes up anywhere in the body
+$('body').on('mouseup touchend', function() { 
   clearTimeout(_pressTimeout);
   _pressing = false; // the state is set to not pressing
   _dragging = false; // and not dragging
 });
-
-document.addEventListener("touchstart", function(){}, true);
