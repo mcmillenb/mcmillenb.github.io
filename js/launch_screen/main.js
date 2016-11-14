@@ -17,7 +17,8 @@ $page.sortable({
     _pressing = false;
     $(this).sortable('disable');
   }
-}).sortable('disable'); // disable initially
+});
+$page.sortable('disable'); // disable initially
 $page.disableSelection();
 
 /**
@@ -83,7 +84,6 @@ $icons.mousedown(function(e) { // when the mouse goes down on an icon
   var $this = $(this);
   var event = e;
   _pressing = true;
-  $page.disableSelection();
   _pressTimeout = setTimeout(function() { // start dragging after half a second
     $page.sortable('enable'); // enable the sort (and drag) effects on icons
     startDragging();
