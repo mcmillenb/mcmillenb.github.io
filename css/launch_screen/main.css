@@ -38,6 +38,13 @@
   border-radius: 15px;
 }
 
+* { // disable text selection for mobile press-and-hold
+  -ms-user-select: none;
+  -moz-user-select: -moz-none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 #icon1 {
   background-image: url('../../images/launch_screen/icon-amazon.png');
 }
