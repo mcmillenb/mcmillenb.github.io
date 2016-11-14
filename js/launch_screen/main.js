@@ -100,3 +100,5 @@ $('body').mouseup(function() { // when the mouse goes up anywhere in the body
   _pressing = false; // the state is set to not pressing
   _dragging = false; // and not dragging
 });
+
+document.addEventListener("touchstart", function(){}, true);
