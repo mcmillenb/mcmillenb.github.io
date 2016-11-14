@@ -6,7 +6,9 @@
   border-radius: 25px;
   margin: 0 auto;
   overflow: scroll;
-  background-color: white;
+
+  background: radial-gradient(circle at 50% 50%, #BF55EC 0%, #BF55EC 10%, #212121);
+  background-size: 100%;
 }
 
 .container {
