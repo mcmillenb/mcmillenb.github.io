@@ -1,12 +1,12 @@
 #page {
   position: relative;
-  height: 400px;
-  max-width: 90%;
+  height: 470px;
+  width: 90%;
+  max-width: 1200px;
   min-width: 240px;
   border-radius: 25px;
   margin: 0 auto;
-  overflow: scroll;
-
+  overflow: hidden;
   background: radial-gradient(circle at 50% 50%, #BF55EC 0%, #BF55EC 10%, #212121);
   background-size: 100%;
 }
