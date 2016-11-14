@@ -19,6 +19,7 @@ $page.sortable({
   }
 }).sortable('disable'); // disable initially
 $page.disableSelection();
+$icons.disableSelection();
 
 /**
  * Animate an icon element to wiggle rotationally
