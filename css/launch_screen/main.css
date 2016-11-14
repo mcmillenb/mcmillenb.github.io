@@ -1,12 +1,12 @@
 #page {
   position: relative;
-  height: 470px;
+  height: 400px;
   width: 90%;
   max-width: 1200px;
   min-width: 240px;
   border-radius: 25px;
   margin: 0 auto;
-  overflow: hidden;
+  overflow: scroll;
   background-color: white;
 }
 
